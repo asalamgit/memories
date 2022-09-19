@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 //raccourci creation component : rafce
 import useStyles from './styles';
 import Input from './Input';
 import { Avatar, Button, Paper, Grid, Typography, Container } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { GoogleLogin } from 'react-google-login';
+import Icon from './icon';
+import { gapi } from 'gapi-script';
 
 const Auth = () => {
 	const classes = useStyles();
 	const [isSignup, setIsSignup] = useState(true);
 	const [showPassword, setShowPassword] = useState(false);
+  const clientId = "403949062269-ir93v9kqb3jko4ag27kcu12bqnvs5b19.apps.googleusercontent.com"
+
+	useEffect(() => {
+		gapi.load('client:auth2', () => {
+			gapi.auth2.init({ clientId: clientId });
+		});
+	},[]);
 
 	const handleShowPassword = () => setShowPassword(!showPassword);
 
@@ -19,6 +29,14 @@ const Auth = () => {
 	const switchMode = () => {
 		setIsSignup((prevIsSignup) => !prevIsSignup);
 		setShowPassword(false);
+	};
+
+	const googleSuccess = async (res) => {
+		console.log(res);
+	};
+
+	const googleError = (res) => {
+		console.log(res);
 	};
 
 	return (
@@ -43,6 +61,17 @@ const Auth = () => {
 					<Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
 						{isSignup ? 'Sign up' : 'Sign in'}
 					</Button>
+					<GoogleLogin
+						clientId="403949062269-ir93v9kqb3jko4ag27kcu12bqnvs5b19.apps.googleusercontent.com"
+						render={(renderProps) => (
+							<Button className={classes.googleButton} color="primary" fullWidth onClick={renderProps.onClick} disabled={renderProps.disabled} startIcon={<Icon />} variant="contained">
+								Google Sign In
+							</Button>
+						)}
+						onSuccess={googleSuccess}
+						onFailure={googleError}
+						cookiePolicy="single_host_origin"
+					/>
 					<Grid container justifyContent="flex-end">
 						<Grid item>
 							<Button onClick={switchMode}>{isSignup ? 'Already have an account? Sign in' : "Don't have an account? Sign Up"}</Button>
