@@ -8,10 +8,12 @@ import { GoogleLogin } from 'react-google-login';
 import Icon from './icon';
 import { gapi } from 'gapi-script';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 const Auth = () => {
 	const classes = useStyles();
   const dispatch = useDispatch();
+	const history = useHistory();
   const clientId = "403949062269-ir93v9kqb3jko4ag27kcu12bqnvs5b19.apps.googleusercontent.com"
 	const [isSignup, setIsSignup] = useState(true);
 	const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +44,7 @@ const Auth = () => {
     try {
       dispatch({ type: 'AUTH', data: { result, token } });
 
-      // history.push('/');
+      history.push('/');
     } catch (error) {
       console.log(error);
     }
