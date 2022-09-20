@@ -7,12 +7,14 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { GoogleLogin } from 'react-google-login';
 import Icon from './icon';
 import { gapi } from 'gapi-script';
+import { useDispatch } from 'react-redux';
 
 const Auth = () => {
 	const classes = useStyles();
+  const dispatch = useDispatch();
+  const clientId = "403949062269-ir93v9kqb3jko4ag27kcu12bqnvs5b19.apps.googleusercontent.com"
 	const [isSignup, setIsSignup] = useState(true);
 	const [showPassword, setShowPassword] = useState(false);
-  const clientId = "403949062269-ir93v9kqb3jko4ag27kcu12bqnvs5b19.apps.googleusercontent.com"
 
 	useEffect(() => {
 		gapi.load('client:auth2', () => {
@@ -31,9 +33,20 @@ const Auth = () => {
 		setShowPassword(false);
 	};
 
-	const googleSuccess = async (res) => {
-		console.log(res);
-	};
+  const googleSuccess = async (res) => {
+    console.log(res);
+    
+    const result = res?.profileObj;
+    const token = res?.tokenId;
+
+    try {
+      dispatch({ type: 'AUTH', data: { result, token } });
+
+      // history.push('/');
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
 	const googleError = (res) => {
 		console.log(res);
