@@ -9,46 +9,60 @@ import Icon from './icon';
 import { gapi } from 'gapi-script';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { signin, signup } from '../../actions/auth';
+
+const initialState = { firstName: '', lastName: '', email: '', password: '', confirmPassword: '' };
 
 const Auth = () => {
 	const classes = useStyles();
-  const dispatch = useDispatch();
+	const dispatch = useDispatch();
 	const history = useHistory();
-  const clientId = "403949062269-ir93v9kqb3jko4ag27kcu12bqnvs5b19.apps.googleusercontent.com"
+	const clientId = '403949062269-ir93v9kqb3jko4ag27kcu12bqnvs5b19.apps.googleusercontent.com';
 	const [isSignup, setIsSignup] = useState(true);
 	const [showPassword, setShowPassword] = useState(false);
+	const [form, setForm] = useState(initialState);
 
 	useEffect(() => {
 		gapi.load('client:auth2', () => {
 			gapi.auth2.init({ clientId: clientId });
 		});
-	},[]);
+	}, []);
 
 	const handleShowPassword = () => setShowPassword(!showPassword);
 
-	const handleSubmit = (e) => {};
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		
+		if (isSignup) {
+      dispatch(signup(form, history));
+    } else {
+      dispatch(signin(form, history));
+    }
+	};
 
-	const handleChange = (e) => {};
+	const handleChange = (e) => {
+		setForm({ ...form, [e.target.name]: e.target.value });
+	};
 
 	const switchMode = () => {
 		setIsSignup((prevIsSignup) => !prevIsSignup);
 		setShowPassword(false);
 	};
 
-  const googleSuccess = async (res) => {
-    console.log(res);
-    
-    const result = res?.profileObj;
-    const token = res?.tokenId;
+	const googleSuccess = async (res) => {
+		console.log(res);
 
-    try {
-      dispatch({ type: 'AUTH', data: { result, token } });
+		const result = res?.profileObj;
+		const token = res?.tokenId;
 
-      history.push('/');
-    } catch (error) {
-      console.log(error);
-    }
-  };
+		try {
+			dispatch({ type: 'AUTH', data: { result, token } });
+
+			history.push('/');
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
 	const googleError = (res) => {
 		console.log(res);
@@ -65,8 +79,8 @@ const Auth = () => {
 					<Grid container spacing={2}>
 						{isSignup && (
 							<>
-								<Input name="first name" label="First Name" handleChange={handleChange} autoFocus half />
-								<Input name="last name" label="Last Name" handleChange={handleChange} half />
+								<Input name="firstName" label="First Name" handleChange={handleChange} autoFocus half />
+								<Input name="lastName" label="Last Name" handleChange={handleChange} half />
 							</>
 						)}
 						<Input name="email" label="Email Adress" handleChange={handleChange} type="email" />
